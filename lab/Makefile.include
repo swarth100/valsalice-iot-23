@@ -1,0 +1,39 @@
+# Allow for all parent instructions to be used in the child directories
+include ../../Makefile.lab
+
+# Check if the first word is a target matching *.run
+# We handle this case differently as we wish to be able to pass arguments down to binaries on the run target ONLY.
+ifneq (,$(findstring .run,$(firstword $(MAKECMDGOALS))))
+  # Extract the program name (without .run)
+  prog_name := $(basename $(firstword $(MAKECMDGOALS)))
+  # Get the arguments for the run
+  runargs := $(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS))
+  # Make the arguments "do nothing"
+  $(eval $(runargs):;@true)
+endif
+
+# Definitions
+UNITY_DIR = ../../tests/
+CC = gcc
+BUILD_DIR = build
+
+# Ensure the build directory exists
+$(BUILD_DIR):
+	mkdir -p $@
+
+# Rule for building a program and placing binary in build directory
+%.build: $(BUILD_DIR)
+	$(CC) -o $(BUILD_DIR)/$* $*.c
+
+# Rule for testing a program using Unity
+%.test:
+	$(CC) -DTESTING -o $(BUILD_DIR)/test_$* $*.c tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
+	./$(BUILD_DIR)/test_$*
+
+# Rule to run the compiled program with given arguments
+%.run: %.build
+	@./$(BUILD_DIR)/$(prog_name) $(runargs)
+
+# Rule for cleaning up compiled executables
+%.clean:
+	rm -f $(BUILD_DIR)/$* $(BUILD_DIR)/test_$*

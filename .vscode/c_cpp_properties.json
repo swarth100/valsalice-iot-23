@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/components/boards",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/modules/nrfx/hal",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/modules/nrfx",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/modules/nrfx/templates/nRF52840",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/modules/nrfx/mdk",
+                "${workspaceFolder}/arch/cpu/nrf",
+                "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/components/libraries/util",
+                "${workspaceFolder}/arch/cpu/nrf52840",
+                "${workspaceFolder}/tests"
+            ],
+            "defines":[
+                "UNITY_EXCLUDE_LIMITS_H"
+            ],
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

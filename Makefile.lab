@@ -1,0 +1,45 @@
+.PHONY: remote-clear setup save
+
+# Rule to cleanup the git remote detaching the repository from the current upstream
+remote-clear:
+	@git remote remove origin 2>/dev/null || true; \
+	echo "✅ Git remote has been cleared."
+
+# Rule to setup the repository attaching it to a remote upstream based on the user's username
+setup:
+	@read -p "Enter your username: " username; \
+	git remote remove origin 2>/dev/null || true; \
+	git remote add origin https://$$username@git.spina.me/$$username/valsalice-iot-23.git; \
+	git config user.name "$$username"; \
+	git config user.email "$$username@example.com"; \
+	if [ "$$(git branch --show-current)" != "master" ]; then \
+		echo "❌ Error: You are not on branch master. You must be on branch master."; \
+		exit 1; \
+	fi; \
+	git pull origin master ; \
+	git branch --set-upstream-to=origin/master master ; \
+	echo "✅ Repository setup complete!"
+
+# Rule to save (commit + push) the current changes to the repository to the upstream.
+# We ensure to `cd` to the root of the repository to allow all filechanges to be picked up
+# regardless of where we decide to run the command from.
+save:
+	@original_dir=$$(pwd); \
+	git_root=$$(git rev-parse --show-toplevel); \
+	cd $$git_root; \
+	if [ -z "$$(git remote | grep origin)" ]; then \
+		echo "❌ No remote named 'origin' found. Please run 'make setup' first."; \
+		exit 1; \
+	fi; \
+	git add . ; \
+	if git diff-index --quiet HEAD --; then \
+		echo "There are no changes to commit."; \
+		git push origin master; \
+		echo "✅ All done!"; \
+		exit 0; \
+	fi; \
+	read -p "Enter commit message: " message; \
+	git commit -m "$$message"; \
+	git push origin master ; \
+	echo "✅ Changes committed and pushed. All done!"; \
+	cd $$original_dir
