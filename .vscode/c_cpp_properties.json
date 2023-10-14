@@ -12,9 +12,13 @@
                 "${workspaceFolder}/arch/cpu/nrf",
                 "${workspaceFolder}/arch/cpu/nrf52840/lib/nrf52-sdk/components/libraries/util",
                 "${workspaceFolder}/arch/cpu/nrf52840",
-                "${workspaceFolder}/tests"
+                "${workspaceFolder}/tests",
+                "${workspaceFolder}/arch/cpu/nrf/lib/nrfx",
+                "${workspaceFolder}/arch/cpu/nrf/lib/nrfx/mdk",
+                "${workspaceFolder}/os/services/tsch-cs",
+                "${workspaceFolder}/os/lib"
             ],
-            "defines":[
+            "defines": [
                 "UNITY_EXCLUDE_LIMITS_H"
             ],
             "cppStandard": "c++17"
