@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "scripts"
+version = "0.1.0"
+description = "Scripts to run the nrf52840LAB sessions"
+authors = ["Alberto Spina <alberto.spina@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.25"
+click = "^8.1.7"
+python-decouple = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
