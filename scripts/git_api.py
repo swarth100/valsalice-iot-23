@@ -1,3 +1,4 @@
+import sys
 import requests
 import json
 import click
@@ -26,9 +27,35 @@ def get_admin_url() -> str:
     return f"https://{ADMIN_USERNAME}:{ADMIN_PASSWORD}@{BASE_URL}"
 
 
+def create_user(username: str, password: str):
+    # Deleting the user is idempotent and should always be performed
+    requests.delete(f"{get_admin_url()}/api/v1/admin/users/{username}?purge=true")
+
+    user_creation_response = requests.post(
+        f"{get_admin_url()}/api/v1/admin/users",
+        headers=headers,
+        json={
+            "username": username,
+            "password": password,
+            "must_change_password": False,
+            "email": f"{username}@example.com",
+        },
+    )
+
+    if user_creation_response.status_code != 201:
+        print(
+            f"Failed to create user {username}. "
+            f"Reason: [{user_creation_response.status_code}] {user_creation_response.content}"
+        )
+        sys.exit(1)
+    else:
+        print(f"User {username} created successfully!")
+
+
 def create_repository(username: str, password: str):
     repo_url = f"{get_user_url(username, password)}/{username}/{REPO_NAME}"
 
+    # Clean existing repository if present
     repo_api_url: str = (
         f"{get_user_url(username, password)}/api/v1/repos/{username}/{REPO_NAME}"
     )
@@ -74,6 +101,8 @@ def create_repository(username: str, password: str):
 
 
 def clone_repository(username: str, password: str):
+    create_user(username, password)
+
     user_repo_url = create_repository(username, password)
 
     if user_repo_url:
@@ -147,11 +176,14 @@ def main(command: str, username: str, all: bool):
     if all:
         users = user_credentials.copy()
     else:
+        if username is None:
+            print("Username argument must not be None! Use --all to run for all users.")
+            sys.exit(1)
         if username not in user_credentials:
             print(
                 f"Selected user '{username}' does not have an entry in the credentials file!"
             )
-            exit
+            sys.exit(1)
         users = {username: user_credentials[username]}
 
     for user, password in users.items():
@@ -161,7 +193,9 @@ def main(command: str, username: str, all: bool):
             sha1_hash = "foo"
             deploy_changes(user, password, sha1_hash)
         else:
-            click.echo(f"Invalid command for {user}. Use 'clone' or 'deploy'.")
+            click.echo(f"Invalid command for {user}. Use 'setup' or 'deploy'.")
+
+        print("-----------------------------------------------")
 
 
 if __name__ == "__main__":
