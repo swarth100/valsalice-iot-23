@@ -1,7 +1,6 @@
 #include "unity/unity.h"
 
-// Declaring the function defined in fibonacci.c (given we do not use header files)
-extern int fibonacci(int n);  
+#include "../fibonacci.c"
 
 // These are required by Unity
 void setUp(void) {}

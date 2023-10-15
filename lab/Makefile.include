@@ -27,7 +27,7 @@ $(BUILD_DIR):
 
 # Rule for testing a program using Unity
 %.test:
-	$(CC) -DTESTING -o $(BUILD_DIR)/test_$* $*.c tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
+	$(CC) -DTESTING -o $(BUILD_DIR)/test_$* tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
 	./$(BUILD_DIR)/test_$*
 
 # Rule to run the compiled program with given arguments
