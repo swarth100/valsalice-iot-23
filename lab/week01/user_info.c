@@ -14,7 +14,7 @@ int main() {
     printf("Enter your height in meters: ");
     scanf("%f", &height);
 
-    printf("User is named %s with age %d and height %.2f meters.\n", name, age, height);
+    printf("%s has age %d is %.2f meters tall.\n", name, age, height);
 
     return 0;
 }
