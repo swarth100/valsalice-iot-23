@@ -130,44 +130,12 @@ def clone_repository(username: str, password: str):
             shutil.rmtree(temp_dir)
 
 
-def deploy_changes(username: str, password: str, sha1_hash: str):
-    # Create a temporary directory
-    with tempfile.TemporaryDirectory() as temp_dir:
-        # Clone the user's repository to the temporary directory
-        user_repo_url = f"{BASE_URL}/{username}/{REPO_NAME}"
-        subprocess.run(["git", "clone", user_repo_url, temp_dir])
-
-        # Fetch changes from the golden repository
-        subprocess.run(
-            ["git", "fetch", f"{BASE_URL}/{GOLDEN_REPO}", sha1_hash], cwd=temp_dir
-        )
-
-        # Merge changes into the user's repository
-        subprocess.run(["git", "checkout", "master"], cwd=temp_dir)
-        subprocess.run(["git", "merge", f"FETCH_HEAD"], cwd=temp_dir)
-
-        # Push changes to the user's repository
-        subprocess.run(["git", "push"], cwd=temp_dir)
-
-        print(f"Deployed changes to {username}'s repository")
-
-        # Cleanup: Remove the temporary directory
-        shutil.rmtree(temp_dir)
-
-
 @click.command()
-@click.option(
-    "--command",
-    prompt="Enter command (setup/deploy)",
-    help="Command (setup/deploy)",
-    required=True,
-)
 @click.option("--username", help="Username", required=False)
-# @click.option("--sha1_hash", prompt="Enter SHA1 hash", help="SHA1 hash (required for 'deploy')", default="", required=False)
 @click.option(
     "--all", is_flag=True, help="Run for all usernames in the JSON file", required=False
 )
-def main(command: str, username: str, all: bool):
+def main(username: str, all: bool):
     users: dict[str, str]
 
     with open(".credentials.json", "r") as file:
@@ -187,14 +155,7 @@ def main(command: str, username: str, all: bool):
         users = {username: user_credentials[username]}
 
     for user, password in users.items():
-        if command == "setup":
-            clone_repository(user, password)
-        elif command == "deploy":
-            sha1_hash = "foo"
-            deploy_changes(user, password, sha1_hash)
-        else:
-            click.echo(f"Invalid command for {user}. Use 'setup' or 'deploy'.")
-
+        clone_repository(user, password)
         print("-----------------------------------------------")
 
 
