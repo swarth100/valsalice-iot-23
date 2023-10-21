@@ -1,30 +1,18 @@
 import sys
+from common import (
+    ADMIN_USERNAME,
+    GOLDEN_REPO,
+    HEADERS,
+    REPO_NAME,
+    get_admin_url,
+    get_user_url,
+)
 import requests
 import json
 import click
 import subprocess
 import tempfile
 import shutil
-from decouple import config
-
-BASE_URL = "git.spina.me"
-REPO_NAME = "valsalice-iot-23"
-GOLDEN_REPO = f"aspina/{REPO_NAME}"
-ADMIN_USERNAME = config("ADMIN_USERNAME")
-ADMIN_PASSWORD = config("ADMIN_PASSWORD")
-
-# Set up headers with the API token
-headers = {
-    "Content-Type": "application/json",
-}
-
-
-def get_user_url(username: str, password: str) -> str:
-    return f"https://{username}:{password}@{BASE_URL}"
-
-
-def get_admin_url() -> str:
-    return f"https://{ADMIN_USERNAME}:{ADMIN_PASSWORD}@{BASE_URL}"
 
 
 def create_user(username: str, password: str):
@@ -33,7 +21,7 @@ def create_user(username: str, password: str):
 
     user_creation_response = requests.post(
         f"{get_admin_url()}/api/v1/admin/users",
-        headers=headers,
+        headers=HEADERS,
         json={
             "username": username,
             "password": password,
@@ -69,7 +57,7 @@ def create_repository(username: str, password: str):
     # Create a new repository with 'master' as the default branch
     response = requests.post(
         f"{get_user_url(username, password)}/api/v1/user/repos",
-        headers=headers,
+        headers=HEADERS,
         json={
             "name": REPO_NAME,
             "private": True,
@@ -83,7 +71,7 @@ def create_repository(username: str, password: str):
         # Grant access to the given user
         response = requests.put(
             f"{get_user_url(username, password)}/api/v1/repos/{username}/{REPO_NAME}/collaborators/{ADMIN_USERNAME}",
-            headers=headers,
+            headers=HEADERS,
         )
 
         if response.status_code == 204:
