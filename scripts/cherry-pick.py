@@ -7,10 +7,43 @@ import click
 import subprocess
 import tempfile
 import shutil
-from decouple import config
+from contextlib import contextmanager
 
 
-def cherry_pick(username: str, password: str, commit_sha1: str, commit_message: str):
+@contextmanager
+def golden_repo_tempdir():
+    """
+    Create a temporary directory for golden repository as a context manager.
+    Cleans up on exit.
+    Creating the golden directory once significantly reduces cloning costs (time).
+    """
+    with tempfile.TemporaryDirectory() as golden_temp_dir:
+        # Clone the GOLDEN_REPO to the temporary directory
+        subprocess.run(
+            [
+                "git",
+                "clone",
+                f"{get_admin_url()}/{GOLDEN_REPO}",
+                golden_temp_dir,
+            ],
+            cwd=golden_temp_dir,
+        )
+
+        try:
+            yield golden_temp_dir
+        finally:
+            # Cleanup: Remove the temporary directories
+            shutil.rmtree(golden_temp_dir)
+
+
+def cherry_pick(
+    *,
+    username: str,
+    password: str,
+    commit_sha1: str,
+    commit_message: str,
+    golden_temp_dir: str,
+):
     user_repo_url = f"{get_user_url(username, password)}/{username}/{REPO_NAME}"
 
     if user_repo_url:
@@ -21,66 +54,52 @@ def cherry_pick(username: str, password: str, commit_sha1: str, commit_message: 
                 ["git", "clone", user_repo_url, user_temp_dir], cwd=user_temp_dir
             )
 
-            # Create a temporary directory for golden repository
-            with tempfile.TemporaryDirectory() as golden_temp_dir:
-                # Clone the GOLDEN_REPO to the temporary directory
-                subprocess.run(
-                    [
-                        "git",
-                        "clone",
-                        f"{get_admin_url()}/{GOLDEN_REPO}",
-                        golden_temp_dir,
-                    ],
+            # Switch to the specified commit in the GOLDEN_REPO
+            subprocess.run(["git", "checkout", commit_sha1], cwd=golden_temp_dir)
+
+            # Get the list of changed files in the commit
+            changed_files = (
+                subprocess.check_output(
+                    ["git", "diff", "--name-only", "HEAD~1..HEAD"],
                     cwd=golden_temp_dir,
                 )
+                .decode("utf-8")
+                .splitlines()
+            )
 
-                # Switch to the specified commit in the GOLDEN_REPO
-                subprocess.run(["git", "checkout", commit_sha1], cwd=golden_temp_dir)
+            # Copy the changed files to the user's repository
+            for file in changed_files:
+                # Get the directory path of the file and create it in the user's repository if it doesn't exist
+                file_dir = os.path.dirname(file)
+                user_file_dir = os.path.join(user_temp_dir, file_dir)
+                os.makedirs(user_file_dir, exist_ok=True)
 
-                # Get the list of changed files in the commit
-                changed_files = (
-                    subprocess.check_output(
-                        ["git", "diff", "--name-only", "HEAD~1..HEAD"],
-                        cwd=golden_temp_dir,
-                    )
-                    .decode("utf-8")
-                    .splitlines()
+                # Copy the file
+                shutil.copy2(
+                    f"{golden_temp_dir}/{file}", os.path.join(user_temp_dir, file)
                 )
 
-                # Copy the changed files to the user's repository
-                for file in changed_files:
-                    # Get the directory path of the file and create it in the user's repository if it doesn't exist
-                    file_dir = os.path.dirname(file)
-                    user_file_dir = os.path.join(user_temp_dir, file_dir)
-                    os.makedirs(user_file_dir, exist_ok=True)
+            # Commit and push the changes to the user's repository
+            subprocess.run(["git", "add", "."], cwd=user_temp_dir)
+            subprocess.run(
+                [
+                    "git",
+                    "commit",
+                    "--author",
+                    f"{ADMIN_USERNAME} <{ADMIN_USERNAME}@example.com>",
+                    "--message",
+                    commit_message,
+                ],
+                cwd=user_temp_dir,
+            )
+            subprocess.run(["git", "push", "origin", "master"], cwd=user_temp_dir)
 
-                    # Copy the file
-                    shutil.copy2(
-                        f"{golden_temp_dir}/{file}", os.path.join(user_temp_dir, file)
-                    )
+            print(
+                f"Copied changes from commit {commit_sha1} in GOLDEN_REPO to {username}'s repository"
+            )
 
-                # Commit and push the changes to the user's repository
-                subprocess.run(["git", "add", "."], cwd=user_temp_dir)
-                subprocess.run(
-                    [
-                        "git",
-                        "commit",
-                        "--author",
-                        f"{ADMIN_USERNAME} <{ADMIN_USERNAME}@example.com>",
-                        "--message",
-                        commit_message,
-                    ],
-                    cwd=user_temp_dir,
-                )
-                subprocess.run(["git", "push", "origin", "master"], cwd=user_temp_dir)
-
-                print(
-                    f"Copied changes from commit {commit_sha1} in GOLDEN_REPO to {username}'s repository"
-                )
-
-                # Cleanup: Remove the temporary directories
-                shutil.rmtree(user_temp_dir)
-                shutil.rmtree(golden_temp_dir)
+            # Cleanup: Remove the temporary directories
+            shutil.rmtree(user_temp_dir)
 
 
 @click.command()
@@ -113,9 +132,16 @@ def main(username: str, all: bool, commit_sha1: str, commit_message: str):
             sys.exit(1)
         users = {username: user_credentials[username]}
 
-    for user, password in users.items():
-        cherry_pick(user, password, commit_sha1, commit_message)
-        print("-----------------------------------------------")
+    with golden_repo_tempdir() as golden_temp_dir:
+        for user, password in users.items():
+            cherry_pick(
+                username=user,
+                password=password,
+                commit_sha1=commit_sha1,
+                commit_message=commit_message,
+                golden_temp_dir=golden_temp_dir,
+            )
+            print("-----------------------------------------------")
     print(f"-------------- ✅ Complete [{len(users)} operations]--------------")
 
 
