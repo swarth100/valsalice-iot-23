@@ -3,9 +3,9 @@ from decouple import config
 
 BASE_URL = "git.spina.me"
 REPO_NAME = "valsalice-iot-23"
-GOLDEN_REPO = f"aspina/{REPO_NAME}"
 ADMIN_USERNAME = config("ADMIN_USERNAME")
 ADMIN_PASSWORD = config("ADMIN_PASSWORD")
+GOLDEN_REPO = f"{ADMIN_USERNAME}/{REPO_NAME}"
 # Set up headers with the API token
 HEADERS = {
     "Content-Type": "application/json",

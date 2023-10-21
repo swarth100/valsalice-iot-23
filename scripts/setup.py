@@ -145,6 +145,7 @@ def main(username: str, all: bool):
     for user, password in users.items():
         clone_repository(user, password)
         print("-----------------------------------------------")
+    print(f"-------------- ✅ Complete [{len(users)} operations]--------------")
 
 
 if __name__ == "__main__":

@@ -16,8 +16,11 @@ setup:
 		echo "❌ Error: You are not on branch master. You must be on branch master."; \
 		exit 1; \
 	fi; \
+	git stash ; \
+	git reset --hard $(git rev-list --max-parents=0 HEAD) ; \
 	git pull origin master ; \
 	git branch --set-upstream-to=origin/master master ; \
+	git stash pop ; \
 	echo "✅ Repository setup complete!"
 
 # Rule to save (commit + push) the current changes to the repository to the upstream.
