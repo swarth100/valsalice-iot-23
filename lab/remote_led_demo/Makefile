@@ -4,8 +4,6 @@ CONTIKI = ../..
 MODULES_REL += $(TARGET)
 MAKE_NET = MAKE_NET_NULLNET
 
-PLATFORMS_ONLY = nrf52840
-
 all: $(CONTIKI_PROJECT)
 
 include $(CONTIKI)/Makefile.include

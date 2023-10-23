@@ -1,9 +1,14 @@
 #include "contiki.h"
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
-#include "dev/etc/rgb-led/rgb-led.h"
 #include <string.h>
 #include <stdio.h> /* For printf() */
+
+#ifndef COOJA
+#include "dev/etc/rgb-led/rgb-led.h"
+#else
+#include "dev/leds.h"
+#endif
 
 /* Log configuration */
 #include "sys/log.h"
@@ -29,12 +34,22 @@ void input_callback(const void *data, uint16_t len,
     if (count % 2 == 0)
     {
       LOG_INFO("Setting LED off.\n");
+
+#ifndef COOJA
       rgb_led_off();
+#else
+      leds_single_off(LEDS_LED1);
+#endif
     }
     else
     {
       LOG_INFO("Setting LED on (to white).\n");
+
+#ifndef COOJA
       rgb_led_set(RGB_LED_WHITE);
+#else
+      leds_single_on(LEDS_LED1);
+#endif
     }
   }
 }

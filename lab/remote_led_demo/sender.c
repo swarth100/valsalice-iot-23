@@ -1,9 +1,14 @@
 #include "contiki.h"
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
-#include "dev/etc/rgb-led/rgb-led.h"
 #include <string.h>
 #include <stdio.h> /* For printf() */
+
+#ifndef COOJA
+#include "dev/etc/rgb-led/rgb-led.h"
+#else
+#include "dev/leds.h"
+#endif
 
 /* Log configuration */
 #include "sys/log.h"
@@ -49,13 +54,21 @@ PROCESS_THREAD(remote_led_demo_sender, ev, data)
       count++;
       etimer_reset(&periodic_timer);
 
+#ifndef COOJA
       rgb_led_set(RGB_LED_GREEN);
+#else
+      leds_single_on(LEDS_LED1);
+#endif
       etimer_set(&blink_timer, BLINK_INTERVAL);
     }
     else if (etimer_expired(&blink_timer))
     {
-      // Handle toggling the LED after a short while
+// Handle toggling the LED after a short while
+#ifndef COOJA
       rgb_led_off();
+#else
+      leds_single_off(LEDS_LED1);
+#endif
     }
   }
 
