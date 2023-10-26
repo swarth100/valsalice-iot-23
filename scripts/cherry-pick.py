@@ -1,7 +1,12 @@
 import os
 import sys
-from common import ADMIN_USERNAME, GOLDEN_REPO, REPO_NAME, get_admin_url, get_user_url
-import requests
+from common import (
+    ADMIN_USERNAME,
+    GOLDEN_REPO,
+    REPO_NAME,
+    get_admin_url,
+    get_user_url,
+)
 import json
 import click
 import subprocess
@@ -60,7 +65,7 @@ def cherry_pick(
             # Get the list of changed files in the commit
             changed_files = (
                 subprocess.check_output(
-                    ["git", "diff", "--name-only", "HEAD~1..HEAD"],
+                    ["git", "diff", "--name-only", "--diff-filter=AM", "HEAD~1..HEAD"],
                     cwd=golden_temp_dir,
                 )
                 .decode("utf-8")
@@ -78,6 +83,25 @@ def cherry_pick(
                 shutil.copy2(
                     f"{golden_temp_dir}/{file}", os.path.join(user_temp_dir, file)
                 )
+
+            # Get the list of deleted files
+            deleted_files: list[str] = (
+                subprocess.check_output(
+                    ["git", "diff", "--name-only", "--diff-filter=D", "HEAD~1..HEAD"],
+                    cwd=golden_temp_dir,
+                )
+                .decode("utf-8")
+                .splitlines()
+            )
+
+            # Apply deletions.
+            # Deletions are idempotent, thus if the file to be deleted is not there it's okay, we can skip.
+            for filename in deleted_files:
+                try:
+                    subprocess.run(["rm", filename], cwd=user_temp_dir, check=True)
+                    print(f"Deleted file {filename}.")
+                except subprocess.CalledProcessError:
+                    print(f"Cannot find file {filename} to be deleted.")
 
             # Commit and push the changes to the user's repository
             subprocess.run(["git", "add", "."], cwd=user_temp_dir)
