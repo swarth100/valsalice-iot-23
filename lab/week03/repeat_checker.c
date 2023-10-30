@@ -10,16 +10,13 @@ int main()
     scanf("%d", &num);
 
     // Validity Check:
-    if ((num >= 0) && (num <= 100))
-    {
-        printf("Well Done!\n");
-    }
-    else
+    if ((num < 0) || (num > 100))
     {
         printf("ERROR! Try again: ");
         scanf("%d", &num);
-        printf("Well Done!\n");
     }
+
+    printf("Well Done!\n");
 
     return 0;
 }
