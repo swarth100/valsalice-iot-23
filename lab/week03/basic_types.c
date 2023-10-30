@@ -24,15 +24,5 @@ int main()
     printf("Multiplication: %d\n", multiplication);
     printf("Division: %d\n", division);
 
-    bool greater = num1 > num2;
-    bool smaller = num1 < num2;
-    bool equality = num1 == num2;
-    bool inequality = num1 != num2;
-
-    printf("Num1 is greater than num2? %d\n", greater);
-    printf("Num1 is smaller than num2?: %d\n", smaller);
-    printf("Num1 is equal to num2?: %d\n", equality);
-    printf("Num1 is different from num2?: %d\n", inequality);
-
     return 0;
 }
