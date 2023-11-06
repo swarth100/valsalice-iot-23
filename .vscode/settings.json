@@ -46,6 +46,8 @@
     "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
     "python.formatting.provider": "none",
     "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
