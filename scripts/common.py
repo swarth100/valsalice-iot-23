@@ -8,6 +8,7 @@ REPO_NAME = "valsalice-iot-23"
 ADMIN_USERNAME = config("ADMIN_USERNAME")
 ADMIN_PASSWORD = config("ADMIN_PASSWORD")
 GOLDEN_REPO = f"{ADMIN_USERNAME}/{REPO_NAME}"
+# GOLDEN_REPO = f"{ADMIN_USERNAME}/valsalice-contiki-lab"
 # Set up headers with the API token
 HEADERS = {
     "Content-Type": "application/json",
