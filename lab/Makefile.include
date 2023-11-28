@@ -26,7 +26,7 @@ $(BUILD_DIR):
 	$(CC) -o $(BUILD_DIR)/$* $*.c
 
 # Rule for testing a program using Unity
-%.test:
+%.test: %.build
 	$(CC) -DTESTING -o $(BUILD_DIR)/test_$* tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
 	./$(BUILD_DIR)/test_$*
 
