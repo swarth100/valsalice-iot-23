@@ -14,7 +14,6 @@ endif
 
 # Definitions
 UNITY_DIR = ../../tests/
-CC = gcc
 BUILD_DIR = build
 
 # Ensure the build directory exists
@@ -23,11 +22,11 @@ $(BUILD_DIR):
 
 # Rule for building a program and placing binary in build directory
 %.build: $(BUILD_DIR)
-	$(CC) -o $(BUILD_DIR)/$* $*.c
+	gcc -o $(BUILD_DIR)/$* $*.c
 
 # Rule for testing a program using Unity
 %.test: %.build
-	$(CC) -DTESTING -o $(BUILD_DIR)/test_$* tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
+	gcc -DTESTING -o $(BUILD_DIR)/test_$* tests/test_$*.c $(UNITY_DIR)/unity/unity.c -I$(UNITY_DIR)
 	./$(BUILD_DIR)/test_$*
 
 # Rule to run the compiled program with given arguments

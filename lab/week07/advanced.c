@@ -9,6 +9,15 @@ void replace_even_with_8(int arr[], int size)
     // TODO: Implement this function
 }
 
+// Function to find the maximum element in an integer array
+// Example input: {1, 7, 9, 4, 5}
+// Example output: 9
+int find_max_element(int arr[], int size)
+{
+    // TODO: Implement this function
+    return -1;
+}
+
 // Function to reverse an integer array
 // Example input: {1, 2, 3, 4, 5}
 // Example output: {5, 4, 3, 2, 1}
@@ -26,15 +35,6 @@ bool is_prime(int num)
 {
     // TODO: Implement this function
     return false;
-}
-
-// Function to find the maximum element in an integer array
-// Example input: {1, 7, 9, 4, 5}
-// Example output: 9
-int find_max_element(int arr[], int size)
-{
-    // TODO: Implement this function
-    return -1;
 }
 
 /***********************************************************************************/
