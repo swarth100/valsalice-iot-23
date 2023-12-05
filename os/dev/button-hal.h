@@ -125,26 +125,27 @@
 #endif
 /*---------------------------------------------------------------------------*/
 #define BUTTON_HAL_STATE_RELEASED 0
-#define BUTTON_HAL_STATE_PRESSED  1
+#define BUTTON_HAL_STATE_PRESSED 1
 /*---------------------------------------------------------------------------*/
 /**
  * Optional button IDs
  */
-#define BUTTON_HAL_ID_BUTTON_ZERO  0x00
-#define BUTTON_HAL_ID_BUTTON_ONE   0x01
-#define BUTTON_HAL_ID_BUTTON_TWO   0x02
+#define BUTTON_HAL_ID_BUTTON_ZERO 0x00
+#define BUTTON_HAL_ID_BUTTON_ONE 0x01
+#define BUTTON_HAL_ID_BUTTON_TWO 0x02
 #define BUTTON_HAL_ID_BUTTON_THREE 0x03
-#define BUTTON_HAL_ID_BUTTON_FOUR  0x04
-#define BUTTON_HAL_ID_BUTTON_FIVE  0x05
+#define BUTTON_HAL_ID_BUTTON_FOUR 0x04
+#define BUTTON_HAL_ID_BUTTON_FIVE 0x05
 
-#define BUTTON_HAL_ID_USER_BUTTON  BUTTON_HAL_ID_BUTTON_ZERO
+#define BUTTON_HAL_ID_USER_BUTTON BUTTON_HAL_ID_BUTTON_ZERO
 /*---------------------------------------------------------------------------*/
 /**
  * \brief A logical representation of a user button
  */
 typedef struct button_hal_button_s button_hal_button_t;
 
-struct button_hal_button_s {
+struct button_hal_button_s
+{
   /** Used by the s/w debounce functionality */
   struct ctimer debounce_ctimer;
 
@@ -201,22 +202,22 @@ struct button_hal_button_s {
  * \param id A unique numeric identifier
  */
 #define BUTTON_HAL_BUTTON(name, descr, po, pi, u, id, nl) \
-  static button_hal_button_t name = { \
-    .description = descr, \
-    .port = po, \
-    .pin = pi, \
-    .pull = u, \
-    .unique_id = id, \
-    .negative_logic = nl, \
+  static button_hal_button_t name = {                     \
+      .description = descr,                               \
+      .port = po,                                         \
+      .pin = pi,                                          \
+      .pull = u,                                          \
+      .unique_id = id,                                    \
+      .negative_logic = nl,                               \
   }
 #else /* GPIO_HAL_PORT_PIN_NUMBERING */
 #define BUTTON_HAL_BUTTON(name, descr, pi, u, id, nl) \
-  static button_hal_button_t name = { \
-    .description = descr, \
-    .pin = pi, \
-    .pull = u, \
-    .unique_id = id, \
-    .negative_logic = nl, \
+  static button_hal_button_t name = {                 \
+      .description = descr,                           \
+      .pin = pi,                                      \
+      .pull = u,                                      \
+      .unique_id = id,                                \
+      .negative_logic = nl,                           \
   }
 #endif /* GPIO_HAL_PORT_PIN_NUMBERING */
 
@@ -233,30 +234,30 @@ struct button_hal_button_s {
 
 #if GPIO_HAL_PORT_PIN_NUMBERING
 #define BUTTON_HAL_BUTTON(name, descr, po, pi, u, id, nl) \
-  static button_hal_button_t name = { \
-    .port = po, \
-    .pin = pi, \
-    .pull = u, \
-    .unique_id = id, \
-    .negative_logic = nl, \
+  static button_hal_button_t name = {                     \
+      .port = po,                                         \
+      .pin = pi,                                          \
+      .pull = u,                                          \
+      .unique_id = id,                                    \
+      .negative_logic = nl,                               \
   }
 #else /* GPIO_HAL_PORT_PIN_NUMBERING */
 #define BUTTON_HAL_BUTTON(name, descr, pi, u, id, nl) \
-  static button_hal_button_t name = { \
-    .pin = pi, \
-    .pull = u, \
-    .unique_id = id, \
-    .negative_logic = nl, \
+  static button_hal_button_t name = {                 \
+      .pin = pi,                                      \
+      .pull = u,                                      \
+      .unique_id = id,                                \
+      .negative_logic = nl,                           \
   }
 #endif /* GPIO_HAL_PORT_PIN_NUMBERING */
 
 #define BUTTON_HAL_GET_DESCRIPTION(b) ""
 #endif /* BUTTON_HAL_WITH_DESCRIPTION */
 /*---------------------------------------------------------------------------*/
-#define BUTTON_HAL_BUTTONS(...) \
+#define BUTTON_HAL_BUTTONS(...)                                    \
   button_hal_button_t *button_hal_buttons[] = {__VA_ARGS__, NULL}; \
-  const uint8_t button_hal_button_count = \
-    (sizeof(button_hal_buttons) / sizeof(button_hal_buttons[0])) - 1;
+  const uint8_t button_hal_button_count =                          \
+      (sizeof(button_hal_buttons) / sizeof(button_hal_buttons[0])) - 1;
 /*---------------------------------------------------------------------------*/
 /**
  * \brief The number of buttons on a device

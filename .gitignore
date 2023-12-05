@@ -13,7 +13,9 @@
 *.pyc
 *~
 build/*
+# Ignore Makefile.target files except in the lab directory
 Makefile.target
+!lab/**/Makefile.target
 Makefile.*.defines
 tools/doxygen/html
 tools/readthedocs/_build
