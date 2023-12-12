@@ -21,21 +21,19 @@ PROCESS_THREAD(button_hal_example, ev, data)
       RGB_LED_MAGENTA,
   };
 
+  static int press_count = 0;
   while (1)
   {
     PROCESS_YIELD();
-    if (ev == button_hal_press_event)
+    if (ev == button_hal_release_event)
     {
-      printf("Button pressed!\n");
-      rgb_led_set(colors[0]);
-    }
-    else if (ev == button_hal_release_event)
-    {
-      printf("Button released!\n");
+      rgb_led_off();
+      press_count = 0;
     }
     else if (ev == button_hal_periodic_event)
     {
-      printf("Button kept pressed!\n");
+      rgb_led_set(colors[press_count]);
+      press_count = (press_count + 1) % 5;
     }
   }
 

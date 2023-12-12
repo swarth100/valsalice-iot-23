@@ -20,13 +20,17 @@ AUTOSTART_PROCESSES(&simple_led_program);
 
 void use_rgb(int counter)
 {
-      if (counter % 2 == 0)
+      if (counter % 3 == 0)
       {
             rgb_led_off();
       }
-      else
+      else if (counter % 3 == 1)
       {
-            rgb_led_set(RGB_LED_GREEN);
+            rgb_led_set(RGB_LED_WHITE);
+      }
+      else if (counter % 3 == 2)
+      {
+            rgb_led_set(RGB_LED_CYAN);
       }
 }
 
