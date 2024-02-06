@@ -1,4 +1,4 @@
-.PHONY: remote-clear setup save
+.PHONY: remote-clear setup save cooja
 
 # Rule to cleanup the git remote detaching the repository from the current upstream
 remote-clear:
@@ -45,4 +45,11 @@ save:
 	git commit -m "$$message"; \
 	git push origin master ; \
 	echo "✅ Changes committed and pushed. All done!"; \
+	cd $$original_dir
+
+cooja:
+	@original_dir=$$(pwd); \
+	git_root=$$(git rev-parse --show-toplevel); \
+	cd $$git_root/tools/cooja; \
+	./gradlew run; \
 	cd $$original_dir

@@ -2,16 +2,16 @@
 #include "net/netstack.h"
 #include "net/nullnet/nullnet.h"
 #include <string.h>
-#include <stdio.h>
-#include "dev/etc/rgb-led/rgb-led.h"
+#include <stdio.h> /* For printf() */
+#include "dev/leds.h"
 
+/* Log configuration */
+#include "sys/log.h"
+#define LOG_MODULE "App"
+#define LOG_LEVEL LOG_LEVEL_INFO
+
+/* Configuration */
 #define BLINK_INTERVAL (0.5 * CLOCK_SECOND)
-
-/*---------------------------------------------------------------------------*/
-PROCESS(remote_led_demo_receiver, "Remote Nullnet Receiver");
-AUTOSTART_PROCESSES(&remote_led_demo_receiver);
-
-static struct etimer periodic_timer;
 
 /*---------------------------------------------------------------------------*/
 /* Helper function to receive data over nullnet */
@@ -21,34 +21,33 @@ void receive_nullnet_data(const void *bytes, uint16_t len,
   int data;
   memcpy(&data, bytes, len);
 
-  printf("Color received: %d\n", data);
-  rgb_led_set(data);
-
-  etimer_reset(&periodic_timer);
+  LOG_INFO("Received data: '%d'\n", data);
+  leds_single_on(LEDS_LED1);
 }
 
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(remote_led_demo_receiver, ev, data)
+PROCESS(main_process, "Multi Receiver");
+AUTOSTART_PROCESSES(&main_process);
+
+/*---------------------------------------------------------------------------*/
+PROCESS_THREAD(main_process, ev, data)
 {
-  PROCESS_BEGIN();
+  static struct etimer blink_timer;
 
   /* Initialize NullNet */
   nullnet_set_input_callback(receive_nullnet_data);
 
-  // Set up a periodic event timer to poll the main process
-  etimer_set(&periodic_timer, CLOCK_SECOND);
+  PROCESS_BEGIN();
 
-  while (1)
+  /* Initialize the Timers */
+  etimer_set(&blink_timer, BLINK_INTERVAL);
+
+  while (true)
   {
     PROCESS_WAIT_EVENT();
-
-    printf("Polling for messages...\n");
-
-    if (etimer_expired(&periodic_timer))
+    if (etimer_expired(&blink_timer))
     {
-      etimer_reset(&periodic_timer);
-
-      rgb_led_off();
+      leds_single_off(LEDS_LED1);
     }
   }
 

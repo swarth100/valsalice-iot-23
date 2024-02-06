@@ -8,8 +8,8 @@
 #define BLINK_INTERVAL (0.5 * CLOCK_SECOND)
 
 /*---------------------------------------------------------------------------*/
-PROCESS(ping_process, "Ping Process");
-AUTOSTART_PROCESSES(&ping_process);
+PROCESS(remote_led_demo_receiver, "Ping Process");
+AUTOSTART_PROCESSES(&remote_led_demo_receiver);
 
 static struct etimer blink_timer;
 
@@ -17,7 +17,6 @@ static struct etimer blink_timer;
 /* Helper function to send data over nullnet */
 void send_nullnet_data(int data)
 {
-  /* DO NOT EDIT! */
   printf("Sending data: %d\n", data);
   nullnet_buf = (uint8_t *)&data;
   nullnet_len = sizeof(data);
@@ -33,17 +32,15 @@ void receive_nullnet_data(const void *bytes, uint16_t len,
   memcpy(&data, bytes, len);
 
   printf("Data received: %d\n", data);
-  /* EDIT Below this line */
 
-  // TODO (1): Always turn the LED GREEN when you receive a message
+  rgb_led_set(RGB_LED_GREEN);
+  send_nullnet_data(data * 2);
 
-  // TODO (2): Use `send_nullnet_data` to send back DOUBLE the amount received
-
-  // TODO (3a): Reset the timer to allow for blinking!
+  etimer_reset(&blink_timer);
 }
 
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(ping_process, ev, data)
+PROCESS_THREAD(remote_led_demo_receiver, ev, data)
 {
   PROCESS_BEGIN();
 
@@ -53,11 +50,18 @@ PROCESS_THREAD(ping_process, ev, data)
   // Set up a periodic event timer to poll the main process
   etimer_set(&blink_timer, BLINK_INTERVAL);
 
-  while (true)
+  while (1)
   {
-    PROCESS_YIELD();
+    PROCESS_WAIT_EVENT();
 
-    // TODO (3b): Check if the timer is expired and turn the LEDs off
+    printf("Polling for messages...\n");
+
+    if (etimer_expired(&blink_timer))
+    {
+      etimer_reset(&blink_timer);
+
+      rgb_led_off();
+    }
   }
 
   PROCESS_END();

@@ -8,6 +8,7 @@
 typedef struct
 {
   char team_id;
+  int command;
   int data;
 } message_t;
 
@@ -15,24 +16,23 @@ typedef struct
 // Change the `TEAM_ID` to be your specific team's!
 #define TEAM_ID 'Z'
 
-#define BLINK_INTERVAL (0.5 * CLOCK_SECOND)
-#define RETRY_INTERVAL (3 * CLOCK_SECOND)
+#define BLINK_INTERVAL (5 * CLOCK_SECOND)
 
 /*---------------------------------------------------------------------------*/
-PROCESS(remote_led_demo_receiver, "Counter Process");
-AUTOSTART_PROCESSES(&remote_led_demo_receiver);
+PROCESS(contiki_process, "Counter Process");
+AUTOSTART_PROCESSES(&contiki_process);
 
 static struct etimer blink_timer;
-static struct etimer retry_timer;
 
 /*---------------------------------------------------------------------------*/
 /* Helper function to send data over nullnet */
 void send_nullnet_data(int data)
 {
-  printf("Sending data: %d\n", data);
+  /* DO NOT EDIT! */
+  printf("Sending data from '%c': %d\n", TEAM_ID, data);
 
   message_t buffer = {
-      .team_id = TEAM_ID, .data = data};
+      .team_id = TEAM_ID, .command = -1, .data = data};
   nullnet_buf = (uint8_t *)&buffer;
   nullnet_len = sizeof(message_t);
 
@@ -46,31 +46,21 @@ void receive_nullnet_data(const void *bytes, uint16_t len,
   message_t message;
   memcpy(&message, bytes, len);
 
+  char team = message.team_id;
+  int command = message.command;
   int data = message.data;
 
-  if (message.team_id == TEAM_ID)
+  printf("Received instruction for TEAM: '%c'\n", team);
+
+  if (team == TEAM_ID)
   {
-    printf("Data received: %d\n", data);
-
-    if (data >= 20)
-    {
-      rgb_led_set(RGB_LED_CYAN);
-      etimer_stop(&blink_timer);
-      etimer_stop(&retry_timer);
-    }
-    else
-    {
-      rgb_led_set(RGB_LED_GREEN);
-      send_nullnet_data(data + 1);
-
-      etimer_reset(&blink_timer);
-      etimer_reset(&retry_timer);
-    }
+    printf("Received Command: %d, Data: %d\n", command, data);
+    /* EDIT inside this IF-statement */
   }
 }
 
 /*---------------------------------------------------------------------------*/
-PROCESS_THREAD(remote_led_demo_receiver, ev, data)
+PROCESS_THREAD(contiki_process, ev, data)
 {
   PROCESS_BEGIN();
 
@@ -79,9 +69,8 @@ PROCESS_THREAD(remote_led_demo_receiver, ev, data)
 
   // Set up a periodic event timer to poll the main process
   etimer_set(&blink_timer, BLINK_INTERVAL);
-  etimer_set(&retry_timer, RETRY_INTERVAL);
 
-  while (1)
+  while (true)
   {
     PROCESS_WAIT_EVENT();
 
@@ -90,13 +79,6 @@ PROCESS_THREAD(remote_led_demo_receiver, ev, data)
       etimer_reset(&blink_timer);
 
       rgb_led_off();
-    }
-
-    if (etimer_expired(&retry_timer))
-    {
-      etimer_reset(&retry_timer);
-
-      send_nullnet_data(0);
     }
   }
 
