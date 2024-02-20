@@ -1,5 +1,10 @@
+# Definitions
+ROOT_DIR := $(shell dirname $(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
+UNITY_DIR = $(ROOT_DIR)/tests/
+BUILD_DIR = build
+
 # Allow for all parent instructions to be used in the child directories
-include ../../Makefile.lab
+include $(ROOT_DIR)/Makefile.lab
 
 # Check if the first word is a target matching *.run
 # We handle this case differently as we wish to be able to pass arguments down to binaries on the run target ONLY.
@@ -11,10 +16,6 @@ ifneq (,$(findstring .run,$(firstword $(MAKECMDGOALS))))
   # Make the arguments "do nothing"
   $(eval $(runargs):;@true)
 endif
-
-# Definitions
-UNITY_DIR = ../../tests/
-BUILD_DIR = build
 
 # Ensure the build directory exists
 $(BUILD_DIR):
@@ -36,3 +37,13 @@ $(BUILD_DIR):
 # Rule for cleaning up compiled executables
 %.clean:
 	rm -f $(BUILD_DIR)/$* $(BUILD_DIR)/test_$*
+
+# Custom pattern rule for .makerdiary targets
+# Builds a UF2 file compatible with makerdiary boards
+%.makerdiary:
+	@echo Building $* for Makerdiary...
+	make build/nrf52840/dongle/$*.hex
+	mkdir -p build/nrf52840/makerdiary
+	python3 $(ROOT_DIR)/tools/uf2conv/uf2conv.py -f 0xADA52840 -c -o build/nrf52840/makerdiary/$*.uf2 build/nrf52840/dongle/$*.hex
+	@echo Build complete. You can find the file at:
+	@echo $(CURDIR)/build/nrf52840/makerdiary/$*.uf2
