@@ -47,9 +47,19 @@ save:
 	echo "✅ Changes committed and pushed. All done!"; \
 	cd $$original_dir
 
+# We must install the MSP430-GCC library to compile jammer motes.
+# We are making assumptions that this command is to be run as the `ubuntu` user.
 cooja:
 	@original_dir=$$(pwd); \
 	git_root=$$(git rev-parse --show-toplevel); \
+	if ! command -v msp430-gcc >/dev/null 2>&1; then \
+		echo "msp430-gcc not found, installing..."; \
+		echo ubuntu | sudo -S apt-get install -y gcc-msp430 libc6:i386 libncurses5:i386 libstdc++6:i386 zlib1g:i386; \
+	else \
+		echo "msp430-gcc is already installed."; \
+	fi; \
+	export PATH="$(PATH):/usr/local/bin"; \
+	export PATH="$(PATH):/usr/local/libexec/gcc/msp430/4.7.2"; \
 	cd $$git_root/tools/cooja; \
 	./gradlew run; \
 	cd $$original_dir

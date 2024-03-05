@@ -17,7 +17,9 @@
                 "${workspaceFolder}/arch/cpu/nrf/lib/nrfx/mdk",
                 "${workspaceFolder}/os/services/tsch-cs",
                 "${workspaceFolder}/os/lib",
-                "${workspaceFolder}/arch"
+                "${workspaceFolder}/arch",
+                "${workspaceFolder}/arch/dev/radio/cc2420",
+                "${workspaceFolder}/os/sys"
             ],
             "defines": [
                 "UNITY_EXCLUDE_LIMITS_H"

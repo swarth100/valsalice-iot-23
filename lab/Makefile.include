@@ -47,3 +47,20 @@ $(BUILD_DIR):
 	python3 $(ROOT_DIR)/tools/uf2conv/uf2conv.py -f 0xADA52840 -c -o build/nrf52840/makerdiary/$*.uf2 build/nrf52840/dongle/$*.hex
 	@echo Build complete. You can find the file at:
 	@echo $(CURDIR)/build/nrf52840/makerdiary/$*.uf2
+
+# Custom pattern rule for .makerdiary-upload targets
+# First, build the UF2 file, then search for the Makerdiary device and upload the file if found
+%.makerdiary-upload: %.makerdiary
+	@echo Searching for Makerdiary device...
+	@# Search for the mount point containing INFO_UF2.TXT
+	$(eval MOUNT_POINT=$(shell find /media/$$USER -name INFO_UF2.TXT -exec dirname {} \;))
+	@# Check if MOUNT_POINT has been set
+	@if [ -z "$(MOUNT_POINT)" ]; then \
+		echo "ERROR: No Makerdiary device found. Please make sure it is connected and in bootloader mode."; \
+	else \
+		echo "Makerdiary device found at $(MOUNT_POINT). Uploading UF2 file..."; \
+		cp $(CURDIR)/build/nrf52840/makerdiary/$*.uf2 $(MOUNT_POINT)/ && \
+		echo "Waiting for the device to disconnect..."; \
+		while [ -d "$(MOUNT_POINT)" ]; do sleep 0.1; done; \
+		echo "SUCCESS: Upload complete. You must unplug the device to reboot it and 'make login'."; \
+	fi

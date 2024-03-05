@@ -28,11 +28,13 @@
  *
  */
 
+#include "sys/node-id.h"
 #include "dev/moteid.h"
 #include "lib/simEnvChange.h"
 #include "lib/random.h"
 #include "lib/csprng.h"
 #include <string.h>
+#include <stdio.h>
 
 // COOJA variables
 int simMoteID;
@@ -43,14 +45,18 @@ int simRandomSeed;
 static void
 doInterfaceActionsBeforeTick(void)
 {
-  if (simMoteIDChanged) {
-    struct csprng_seed csprng_seed = { 0 };
+  // Assign Contiki ID to match Simulated ID
+  node_id = simMoteID;
+
+  if (simMoteIDChanged)
+  {
+    struct csprng_seed csprng_seed = {0};
 
     simMoteIDChanged = 0;
     random_init(simRandomSeed);
     memcpy(csprng_seed.u8,
-        &simRandomSeed,
-        MIN(sizeof(simRandomSeed), sizeof(csprng_seed.u8)));
+           &simRandomSeed,
+           MIN(sizeof(simRandomSeed), sizeof(csprng_seed.u8)));
     csprng_feed(&csprng_seed);
   }
 }
