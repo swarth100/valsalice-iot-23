@@ -25,10 +25,13 @@ typedef struct
 // Change the `TEAM_ID` to be your specific team's!
 #define TEAM_ID 'Z'
 
+// The ID of the node that will be sending all the packets
+#define SENDER_NODE_ID 35998
+
 // IMPORTANT!
 // Change this if you add or reduce the number of nodes in the network, or if the IDs change.
 #define N_NODES 4
-int NODE_IDS[N_NODES] = {3, 4, 5, 6};
+int NODE_IDS[N_NODES] = {41870, 4060, 21242, 2980};
 
 /* ************************************************************************* */
 

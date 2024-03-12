@@ -39,11 +39,11 @@
       <mote>
         <interface_config>
           org.contikios.cooja.interfaces.Position
-          <pos x="49.545980002752486" y="50.067000593343074" />
+          <pos x="50" y="50" />
         </interface_config>
         <interface_config>
           org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>2</id>
+          <id>35998</id>
         </interface_config>
       </mote>
     </motetype>
@@ -71,41 +71,41 @@
       <mote>
         <interface_config>
           org.contikios.cooja.interfaces.Position
-          <pos x="20.16584680098583" y="40.37360833587158" />
+          <pos x="20" y="40" />
         </interface_config>
         <interface_config>
           org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>3</id>
+          <id>41870</id>
         </interface_config>
       </mote>
       <mote>
         <interface_config>
           org.contikios.cooja.interfaces.Position
-          <pos x="30.152187875711235" y="-0.3635020319227351" />
+          <pos x="30" y="0" />
         </interface_config>
         <interface_config>
           org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>4</id>
+          <id>4060</id>
         </interface_config>
       </mote>
       <mote>
         <interface_config>
           org.contikios.cooja.interfaces.Position
-          <pos x="69.94128012528108" y="-9.63320043428172" />
+          <pos x="70" y="-10" />
         </interface_config>
         <interface_config>
           org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>5</id>
+          <id>21242</id>
         </interface_config>
       </mote>
       <mote>
         <interface_config>
           org.contikios.cooja.interfaces.Position
-          <pos x="80.0683762644871" y="30.348406916401572" />
+          <pos x="80" y="30" />
         </interface_config>
         <interface_config>
           org.contikios.cooja.contikimote.interfaces.ContikiMoteID
-          <id>6</id>
+          <id>2980</id>
         </interface_config>
       </mote>
     </motetype>
