@@ -17,6 +17,8 @@
 // IMPORTANT: The config.h file contains common configuration!
 #include "config.h"
 
+#define STATS_INTERVAL (30 * CLOCK_SECOND)
+
 static int reception_stats[N_NODES];
 static int send_stats[N_NODES];
 static int cur_node = 0;
@@ -104,23 +106,24 @@ void receive_nullnet_data(const void *bytes, uint16_t len,
       int msg_target_node_id = message.target_node_id;
       int msg_payload = message.payload;
 
-      int expected_source_id = NODE_IDS[cur_node];
+      // The source of a message will be the node sending the response.
+      // This may not be the node the message has originated from!
+      int cur_node_id = NODE_IDS[cur_node];
 
       LOG_INFO("Received message from node_id '%d' for TEAM '%c' for target node '%d'.\n",
                msg_source_node_id, msg_team_id, msg_target_node_id);
 
       // HINT: Change `true` to a different condition
       if (msg_team_id == TEAM_ID &&
-          msg_source_node_id == expected_source_id &&
           msg_target_node_id == node_id)
       {
             // Turn the LED on ONLY IF we receive data
             leds_single_on(LEDS_LED1);
 
             // Verify the received response
-            if (verify_response(msg_source_node_id, msg_payload))
+            if (verify_response(cur_node_id, msg_payload))
             {
-                  reception_stats[get_index_for_node_id(msg_source_node_id)]++;
+                  reception_stats[cur_node]++;
             }
       }
 }
@@ -137,8 +140,8 @@ void print_stats()
             if (send_stats[i] > 0)
             {
                   LOG_INFO(
-                      "Node ID '%d'. Sent: '%d'. Received: '%d'. Success Rate: '%.2f'\n",
-                      NODE_IDS[i], send_stats[i], reception_stats[i], (float)reception_stats[i] / send_stats[i]);
+                      "[STATS] ID '%d'. Sent: '%d'. Received: '%d'. Success Rate: '%d%%'\n",
+                      NODE_IDS[i], send_stats[i], reception_stats[i], (int)((float)reception_stats[i] / send_stats[i] * 100));
             }
       }
 }
@@ -152,6 +155,7 @@ PROCESS_THREAD(main_process, ev, data)
 {
       static struct etimer blink_timer;
       static struct etimer periodic_timer;
+      static struct etimer stats_timer;
 
       PROCESS_BEGIN();
 
@@ -161,6 +165,7 @@ PROCESS_THREAD(main_process, ev, data)
       /* Initialize the Timers */
       etimer_set(&blink_timer, BLINK_INTERVAL);
       etimer_set(&periodic_timer, SEND_INTERVAL);
+      etimer_set(&stats_timer, STATS_INTERVAL);
 
       // Initialise the reception stats
       for (int i = 0; i < N_NODES; i++)
@@ -172,6 +177,14 @@ PROCESS_THREAD(main_process, ev, data)
       while (true)
       {
             PROCESS_WAIT_EVENT();
+
+            if (etimer_expired(&stats_timer))
+            {
+                  etimer_reset(&stats_timer);
+
+                  // Print reception stats
+                  print_stats();
+            }
 
             if (etimer_expired(&periodic_timer))
             {
@@ -185,14 +198,13 @@ PROCESS_THREAD(main_process, ev, data)
 
                   // Periodically send a message
                   // TODO(1): Use `send_nullnet_data` to actually send the message
+                  send_nullnet_data(target_node_id, request_value);
 
                   etimer_reset(&blink_timer);
                   etimer_reset(&periodic_timer);
-
-                  // Print reception stats
-                  print_stats();
             }
-            else if (etimer_expired(&blink_timer))
+
+            if (etimer_expired(&blink_timer))
             {
                   leds_single_off(LEDS_LED1);
             }

@@ -73,7 +73,14 @@ void receive_nullnet_data(const void *bytes, uint16_t len,
     // Generate payload
     int payload = generate_response(msg_payload);
     LOG_INFO("Replying to source node '%d' with payload: %d\n", msg_source_node_id, payload);
-    send_nullnet_data(msg_source_node_id, payload);
+
+    // Always reply back to node 2, the "sink"
+    send_nullnet_data(2, payload);
+  }
+  else
+  {
+    // Relay payload
+    send_nullnet_data(msg_target_node_id, msg_payload);
   }
 }
 

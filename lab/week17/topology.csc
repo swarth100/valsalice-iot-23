@@ -16,37 +16,6 @@
       <logoutput>40000</logoutput>
     </events>
     <motetype>
-      org.contikios.cooja.mspmote.SkyMoteType
-      <description>Jammer</description>
-      <source>[CONTIKI_DIR]/tools/contiki-jamlab/examples/jamlab_example/jamlab_example.c</source>
-      <commands>$(MAKE) -j$(CPUS) jamlab_example.sky TARGET=sky</commands>
-      <firmware>[CONTIKI_DIR]/tools/contiki-jamlab/examples/jamlab_example/jamlab_example.sky</firmware>
-      <moteinterface>org.contikios.cooja.interfaces.Position</moteinterface>
-      <moteinterface>org.contikios.cooja.interfaces.IPAddress</moteinterface>
-      <moteinterface>org.contikios.cooja.interfaces.Mote2MoteRelations</moteinterface>
-      <moteinterface>org.contikios.cooja.interfaces.MoteAttributes</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.MspClock</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.MspMoteID</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.SkyButton</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.SkyFlash</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.SkyCoffeeFilesystem</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.Msp802154Radio</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.MspSerial</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.MspLED</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.MspDebugOutput</moteinterface>
-      <moteinterface>org.contikios.cooja.mspmote.interfaces.SkyTemperature</moteinterface>
-      <mote>
-        <interface_config>
-          org.contikios.cooja.interfaces.Position
-          <pos x="49.84931282121699" y="19.973416194537634" />
-        </interface_config>
-        <interface_config>
-          org.contikios.cooja.mspmote.interfaces.MspMoteID
-          <id>1</id>
-        </interface_config>
-      </mote>
-    </motetype>
-    <motetype>
       org.contikios.cooja.contikimote.ContikiMoteType
       <description>Sender</description>
       <source>[CONFIG_DIR]/sender.c</source>
